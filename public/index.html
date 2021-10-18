@@ -40,7 +40,28 @@
     
     <canvas id="myChart"></canvas>
   </div>
+  <script>
+    let db;
 
+    const request = indexedDB.open("budget", 1);
+
+    request.onupgradeneeded = (evt) => {
+      db = evt.target.result;
+      const objectStore = db.createObjectStore("pendingObjects");
+    }
+
+    const saveRecord = (data) => {
+      
+    }
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js").then(reg => {
+          console.log("We found your service worker file!", reg);
+        });
+      });
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   <script src="index.js"></script>
 </body>
