@@ -47,11 +47,44 @@
 
     request.onupgradeneeded = (evt) => {
       db = evt.target.result;
-      const objectStore = db.createObjectStore("pendingObjects");
+      let objectStore = db.createObjectStore("pendingObjects", {autoIncrement: true});
+    }
+
+    request.onsuccess = (evt) => {
+      db = evt.target.result;
+      syncDatabases();
     }
 
     const saveRecord = (data) => {
-      
+      let transaction = db.transaction("pendingObjects", "readwrite");
+      let store = transaction.objectStore("pendingObjects");
+      store.add(data);
+      syncDatabases();
+    }
+
+    const syncDatabases = () => {
+      if (navigator.onLine) {
+        let transaction = db.transaction("pendingObjects", "readwrite");
+        let store = transaction.objectStore("pendingObjects");
+        let getRequest = store.getAll();
+
+        getRequest.onsuccess = () => {
+          let data = getRequest.result;
+          if (data.length) {
+            fetch("/api/transaction", {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: {
+                Accept: "text/plain, application/json, */*",
+                "Content-Type": "application/json",
+              }
+            }).then(() => {
+              store.clear();
+              window.location.reload();
+            })
+          }
+        }
+      }
     }
 
     if ("serviceWorker" in navigator) {
@@ -61,6 +94,8 @@
         });
       });
     }
+
+
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   <script src="index.js"></script>
