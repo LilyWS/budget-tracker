@@ -79,6 +79,8 @@
                 "Content-Type": "application/json",
               }
             }).then(() => {
+              let transaction = db.transaction("pendingObjects", "readwrite");
+              let store = transaction.objectStore("pendingObjects");
               let clear = store.clear();
               clear.onsuccess = () => window.location.reload();
             })
