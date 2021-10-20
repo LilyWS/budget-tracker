@@ -79,8 +79,8 @@
                 "Content-Type": "application/json",
               }
             }).then(() => {
-              store.clear();
-              window.location.reload();
+              let clear = store.clear();
+              clear.onsuccess = () => window.location.reload();
             })
           }
         }
